@@ -1,0 +1,25 @@
+//Require thoughts and users models
+const { Thoughts, Users } = require("../models");
+
+//Set up thoughts controller
+const thoughtsController = {
+  //Creates new thought
+  createThoughts({ params, body }, res) {
+    Thoughts.create(body);
+    then((dbThoughtData) => {
+      User.findOneAndUpdate(
+        { _id: params.userId },
+        { $push: { thoughts: dbThoughtData._id } },
+        { new: true }
+      )
+        .then((dbUserData) => {
+          if (!dbUserData) {
+            res.status(404).json({ message: "No user found with this Id" });
+            return;
+          }
+          res.json(dbUserData);
+        })
+        .catch((err) => res.status(500).json(err));
+    }).catch((err) => res.status(500).json(err));
+  },
+};
